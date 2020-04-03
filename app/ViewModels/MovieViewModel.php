@@ -22,7 +22,13 @@ class MovieViewModel extends ViewModel
             'release_date' => Carbon::parse($this->movie['release_date'])->format('M d, Y'),
             'genres' => collect($this->movie['genres'])->pluck('name')->flatten()->implode(', '),
             'crew' => collect($this->movie['credits']['crew'])->take(2),
-            'cast' => collect($this->movie['credits']['cast'])->take(5),
+            'cast' => collect($this->movie['credits']['cast'])->take(5)->map(function($cast) {
+                return collect($cast)->merge([
+                    'profile_path' => $cast['profile_path']
+                        ? 'https://image.tmdb.org/t/p/w300'.$cast['profile_path']
+                        : 'https://via.placeholder.com/300x450',
+                ]);
+            }),
             'images' => collect($this->movie['images']['backdrops'])->take(9),
         ])->only([
             'poster_path', 'id', 'genres', 'title', 'vote_average', 'overview', 'release_date', 'credits' ,
